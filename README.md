@@ -2,6 +2,8 @@
 
 **v0.2.0 — surgical rewrite**
 
+**Short technical note:** [TECHNICAL_NOTE.md](TECHNICAL_NOTE.md)
+
 A minimal decision module that introduces an explicit **dynamic hidden variable** required for correct long-horizon residual-diagnostic behavior.
 
 ---
@@ -45,17 +47,21 @@ typedef struct {
 } dcl_state_t;
 ```
 
-* `d, c` — the only observables available to any external monitor
-* `lambda` — commitment tension
-* `chi` — the hidden commitment variable
+- `d, c` — the only observables available to any external monitor
+- `lambda` — commitment tension
+- `chi` — the hidden commitment variable
+
+---
 
 ### Non-Reducibility
 
-Any residual + confidence + hysteresis construction maintains state that is a pure function of a finite history of (d, c).
+Any residual + confidence + hysteresis construction maintains state that is a pure function of a finite history of `(d, c)`.
 
 The value of χ controls both polarity and timing of subsequent commitment acts. After an odd number of transitions of χ, the future trajectory of the joint process diverges from every trajectory generable by a monitor that only sees the visible signals.
 
 The information gap is permanent.
+
+---
 
 ### Usage
 
@@ -74,17 +80,24 @@ if (dcl_commit(&s, &DCL_DEFAULTS, r_corr)) {
 }
 ```
 
+---
+
 ### Files
 
 | File | Description |
 |------|-------------|
 | `dynamic_commitment.h` | Header-only implementation |
 | `DCL_DESIGN_NOTE.md` | Full design rationale and non-reducibility argument |
+| `TECHNICAL_NOTE.md` | Polished short technical note |
 | `dcl_harness.py` | Empirical stress test |
+
+---
 
 ### Historical Note
 
 This module was previously released as the Residual Sublation Layer (v0.1.0).  
 The surgical rewrite retains the repository and the hidden-variable DNA while discarding the elevation/sublation framing in favour of explicit dynamic commitment.
+
+---
 
 License: MIT

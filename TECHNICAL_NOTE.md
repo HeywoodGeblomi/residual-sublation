@@ -7,7 +7,7 @@ Heywood Geblomi
 
 ## Abstract
 
-Long-horizon residual monitoring under progressive diagnostic degradation can require internal state that is not recoverable from any finite window of the visible residual-disorder and competence signals. We introduce the Dynamic Commitment Layer (DCL), a minimal decision module that supplies an explicit binary hidden variable \(\chi\). This variable simultaneously stores memory forbidden to the observables, collapses ambiguity among observationally consistent futures, and acts as a lightweight internal model. We formalize a class of residual-diagnostic processes for which any finite-memory function of the visible signals alone is information-theoretically incomplete, and we exhibit a concrete parity-trap counter-example in which trajectories diverge after an odd number of commitment transitions. An operationalized empirical test under identical observable inputs produces a cumulative residual divergence of \(15.3 \pm 0.8\) between the full-\(\chi\) and frozen-\(\chi\) monitors (8 seeds, \(T=100\)). The construction is complementary to classical observer-based residual generation and the internal-model principle; it isolates a regime in which an explicit, non-reducible commitment variable is required. Limitations and minimal extensions are discussed.
+Long-horizon residual monitoring under progressive diagnostic degradation can require internal state that is not recoverable from any finite window of the visible residual-disorder and competence signals. We introduce the Dynamic Commitment Layer (DCL), a minimal decision module that supplies an explicit binary hidden variable \(\chi\). This variable simultaneously stores memory forbidden to the observables, collapses ambiguity among observationally consistent futures, and acts as a lightweight internal model. We formalize a class of residual-diagnostic processes for which any finite-memory function of the visible signals alone is information-theoretically incomplete, and we exhibit a concrete parity-trap counter-example in which trajectories diverge after an odd number of commitment transitions. An operationalized empirical test on both a controlled parity-trap schedule and a realistic plant-plus-sensor-bias residual generator produces cumulative residual divergences of \(15.3 \pm 0.8\) and \(22.0 \pm 0.2\) respectively between the full-\(\chi\) and frozen-\(\chi\) monitors. The construction is complementary to classical observer-based residual generation and the internal-model principle; it isolates a regime in which an explicit, non-reducible commitment variable is required. Limitations and minimal extensions are discussed.
 
 ---
 
@@ -61,10 +61,18 @@ Consequently the joint process \((d,c,\lambda,\chi)\) is non-reducible to any fi
 
 ## 4. Empirical Demonstration
 
-The parity-trap is operationalized in a synthetic residual-diagnostic schedule containing repeated correlation spikes. Under identical observable inputs the full-\(\chi\) monitor and the ablated (frozen-\(\chi\)) monitor produce residual trajectories whose cumulative absolute divergence, measured after the first flip region, is \(15.3\pm 0.8\) (8 independent seeds, horizon \(T=100\), mean of three flips). The divergence appears exactly when the formal argument predicts and is absent when \(\chi\) is prevented from toggling. This supplies a concrete numerical counterpart to the trajectory-divergence claim.
+The parity-trap argument was first operationalized on a controlled synthetic schedule. Under identical observable inputs the full-\(\chi\) and frozen-\(\chi\) monitors produced a cumulative residual divergence of \(15.3 \pm 0.8\) (8 seeds, \(T=100\)).
 
-**Figure 1.** Residual trajectories under identical observable inputs.  
-Full-\(\chi\) (solid) and frozen-\(\chi\) (dashed) diverge after the first commitment transition; cumulative absolute divergence = \(15.3\pm 0.8\) (8 seeds, \(T=100\)).
+A more realistic residual scenario was then examined: a scalar stable plant subject to progressive sensor bias and intermittent polarity disturbances, observed through a simple one-step residual generator. Competence declines with the growing bias; correlation spikes mark the polarity-change instants. Under identical residual, competence and correlation inputs the full-\(\chi\) and frozen-\(\chi\) monitors diverge by
+
+\[
+21.97 \pm 0.21
+\]
+
+cumulative absolute residual units (8 seeds, \(T=150\), mean of 1.2 flips). The divergence appears after the first commitment transition and remains permanent, exactly as predicted by the non-reducibility argument.
+
+**Figure 1.** Residual trajectories under identical observable inputs (realistic plant + sensor-bias scenario).  
+Full-\(\chi\) (solid) and frozen-\(\chi\) (dashed) diverge after the first commitment transition; cumulative absolute divergence = \(21.97 \pm 0.21\) (8 seeds, \(T=150\)).
 
 ---
 

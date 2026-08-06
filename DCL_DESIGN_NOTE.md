@@ -1,8 +1,7 @@
 # Dynamic Commitment Layer (DCL)
 
-**Design Note — v0.2.1**  
-Status: Core claim locked and formalized.  
-Previous identity: Residual Sublation Layer (historical).
+**Design Note — v0.2.1 + Revealing Channel**  
+Status: Core claim locked. Non-reducibility formalized. Revealing channel added.
 
 ## 1. Core Claim
 
@@ -105,3 +104,24 @@ The present construction addresses a narrower but sharper regime: long-horizon r
 - Empirical support remains synthetic. Realistic residual scenarios (sensor degradation on physical plant data, multi-fault isolation) are required before strong claims of practical utility.
 - The non-reducibility result is specific to the class of processes defined in §4; it does not claim that every residual-diagnostic problem needs a hidden commitment variable.
 - No formal sample-complexity or regret analysis is provided.
+
+## Revealing Channel and Recovery of χ
+
+The original Dynamic Commitment Layer maintains that χ is non-reducible with respect to the ordinary visible signals (d, c). No function of finite histories of these signals recovers χ.
+
+To enable controlled recovery, a privileged revealing channel r_χ is introduced. Its dynamics are a simple leaky integrator driven by the current value of χ:
+
+    r_χ ← (1 − α_r) r_χ + α_r · s(χ)
+
+where s(χ) = +1 when χ = 1 and s(χ) = −1 when χ = 0.
+
+**Recommended default:** α_r = 0.20
+
+Under residual-style schedules that force frequent commitment acts, this setting yields approximately:
+
+- Recovery accuracy ≈ 0.85–0.90
+- Mean recovery lag ≈ 0.3–0.4 steps
+
+Ordinary monitors limited to (d, c) remain information-theoretically incomplete. Recovery is possible only for subsystems that are explicitly given access to the revealing channel r_χ.
+
+Header: `dynamic_commitment_reveal.h`

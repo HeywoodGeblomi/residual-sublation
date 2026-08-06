@@ -1,7 +1,7 @@
 # Dynamic Commitment Layer (DCL)
 
 **Design Note — v0.2.1**  
-Status: Core claim formalized. Empirical ablation + literature + limitations added.  
+Status: Core claim locked and formalized.  
 Previous identity: Residual Sublation Layer (historical).
 
 ## 1. Core Claim
@@ -36,50 +36,50 @@ typedef struct {
 
 | Role | Function |
 |------|----------|
-| **B – Forbidden Memory** | χ retains information that the visible pair ((d,c)) is structurally incapable of carrying forward. |
+| **B – Forbidden Memory** | χ retains information that the visible pair (d,c) is structurally incapable of carrying forward. |
 | **C – Future Selection** | When multiple futures remain consistent with the observations, a transition of χ selects one. |
 | **D – Internal Model** | χ functions as a minimal internal predictor / state estimate of the residual process. |
 
-These three roles are executed by the same bit. The non-reducibility result rests on the fact that no function of finite windows of ((d,c)) can perform all three simultaneously.
+These three roles are executed by the same bit. The non-reducibility result rests on the fact that no function of finite windows of (d,c) can perform all three simultaneously.
 
 ## 4. Non-Reducibility (Formalized)
 
 ### 4.1 Class of Processes
 
-Consider residual-diagnostic processes of the following form. At each discrete time \( t \):
+Consider residual-diagnostic processes of the following form. At each discrete time t:
 
-- Visible signals: \( (d_t, c_t) \in [0,1]^2 \).
-- Hidden commitment state: \( \chi_t \in \{0,1\} \).
-- Commitment tension: \( \lambda_t \in [0,1] \).
-- Dynamics: \( \lambda_{t+1} = f(\lambda_t, d_t, c_t, r_t^{\text{corr}}, \chi_t) \),  
-  \( \chi_{t+1} = \chi_t \oplus \mathbf{1}_{\{\lambda_{t+1}>0.5 \land r_t^{\text{corr}}>\tau\}} \),  
-  and the observation update itself depends on the current \( \chi \) through a polarity/rigidity term (exactly as implemented in `dcl_step`).
+- Visible signals: (d_t, c_t) ∈ [0,1]².
+- Hidden commitment state: χ_t ∈ {0,1}.
+- Commitment tension: λ_t ∈ [0,1].
+- Dynamics: λ_{t+1} = f(λ_t, d_t, c_t, r_t^{corr}, χ_t),
+  χ_{t+1} = χ_t ⊕ 1_{{λ_{t+1}>0.5 ∧ r_t^{corr}>τ}},
+  and the observation update itself depends on the current χ through a polarity/rigidity term (exactly as implemented in `dcl_step`).
 
 The required long-horizon behavior is that the monitor must eventually adopt the correct restricted disposition after an odd number of commitment transitions; adopting the wrong polarity produces permanently elevated residual error.
 
 ### 4.2 Observable-Only Monitors
 
-Any monitor restricted to the visible signals maintains a state that is a (possibly stochastic) function of a finite history window of length \( k < \infty \):
+Any monitor restricted to the visible signals maintains a state that is a (possibly stochastic) function of a finite history window of length k < ∞:
 
-\[
-s_{t+1} = g(s_t, d_t, c_t), \qquad \text{action}_t = h(s_t, d_t, c_t).
-\]
+```
+s_{t+1} = g(s_t, d_t, c_t),    action_t = h(s_t, d_t, c_t).
+```
 
 Such a monitor is a finite-memory function of the observable pair only.
 
-### 4.3 Concrete Counter-Example Process
+### 4.3 Concrete Counter-Example Process (Parity Trap)
 
-Define a two-phase synthetic process (the “parity trap”):
+Define a two-phase synthetic process:
 
-- Phase 1 ( \( t = 0\dots T_1 \) ): Generate identical observable trajectories under both \( \chi=0 \) and \( \chi=1 \). The pair \( (d_t,c_t) \) and the correlation signal \( r_t^{\text{corr}} \) are statistically indistinguishable.
-- At a critical instant \( T_1 \) a commitment-eligible event occurs ( \( \lambda \) crosses threshold and \( r^{\text{corr}} > \tau \) ). The true process flips \( \chi \).
-- Phase 2 ( \( t > T_1 \) ): The correct polarity of the rigidity term is required. Using the wrong polarity produces a sustained positive bias in residual disorder of size \( \Delta > 0 \) that cannot be corrected by any subsequent observable-only action.
+- Phase 1 (t = 0…T₁): Generate identical observable trajectories under both χ=0 and χ=1. The pair (d_t, c_t) and the correlation signal r_t^{corr} are statistically indistinguishable.
+- At a critical instant T₁ a commitment-eligible event occurs (λ crosses threshold and r^{corr} > τ). The true process flips χ.
+- Phase 2 (t > T₁): The correct polarity of the rigidity term is required. Using the wrong polarity produces a sustained positive bias in residual disorder of size Δ > 0 that cannot be corrected by any subsequent observable-only action.
 
-Because the observable histories up to \( T_1 \) are identical for both values of \( \chi \), every finite-memory function \( g,h \) produces the same internal state \( s_{T_1} \) and therefore the same (incorrect) polarity thereafter. Its trajectory therefore diverges permanently from the true process after the odd-numbered flip. The information gap is irreducible: no amount of post-processing of the visible window recovers the parity bit that was required at the critical instant.
+Because the observable histories up to T₁ are identical for both values of χ, every finite-memory function g,h produces the same internal state s_{T₁} and therefore the same (incorrect) polarity thereafter. Its trajectory therefore diverges permanently from the true process after the odd-numbered flip. The information gap is irreducible: no amount of post-processing of the visible window recovers the parity bit that was required at the critical instant.
 
 ### 4.4 Consequence
 
-The joint process \( (d,c,\lambda,\chi) \) is non-reducible to any finite-memory function of the observables alone. The explicit dynamic variable \( \chi \) is necessary for well-posed long-horizon residual-diagnostic behavior under the defined class of processes.
+The joint process (d,c,λ,χ) is non-reducible to any finite-memory function of the observables alone. The explicit dynamic variable χ is necessary for well-posed long-horizon residual-diagnostic behavior under the defined class of processes.
 
 ## 5. Operational Skeleton
 
@@ -97,11 +97,11 @@ This module was previously released as the Residual Sublation Layer (v0.1.0). Th
 
 Classic residual generation for fault detection and isolation relies on observers, parity equations, or Kalman/IMM filters (see, e.g., the observer-based residual literature). These methods recover state estimates from the visible signals under the assumption that the residual generator itself remains observable or that discrete modes can be tracked from the innovation sequence. The internal-model principle likewise supplies the dynamics needed to cancel known exogenous signals, but again assumes those dynamics are either known a priori or identifiable from the observables.
 
-The present construction addresses a narrower but sharper regime: long-horizon residual monitoring under progressive diagnostic degradation, where the correct commitment polarity is information-theoretically invisible from any finite window of residual-disorder and competence signals. In that regime the hidden bit is not recoverable by any finite-memory observer or mode estimator that sees only \( (d,c) \). The contribution is therefore complementary: it isolates a concrete situation in which an explicit, non-reducible internal commitment variable is required.
+The present construction addresses a narrower but sharper regime: long-horizon residual monitoring under progressive diagnostic degradation, where the correct commitment polarity is information-theoretically invisible from any finite window of residual-disorder and competence signals. In that regime the hidden bit is not recoverable by any finite-memory observer or mode estimator that sees only (d,c). The contribution is therefore complementary: it isolates a concrete situation in which an explicit, non-reducible internal commitment variable is required.
 
 ## 8. Limitations and Applicability
 
-- The current module is deliberately minimal (binary \( \chi \), scalar tension). Extension to richer discrete or continuous internal state is left open.
+- The current module is deliberately minimal (binary χ, scalar tension). Extension to richer discrete or continuous internal state is left open.
 - Empirical support remains synthetic. Realistic residual scenarios (sensor degradation on physical plant data, multi-fault isolation) are required before strong claims of practical utility.
 - The non-reducibility result is specific to the class of processes defined in §4; it does not claim that every residual-diagnostic problem needs a hidden commitment variable.
 - No formal sample-complexity or regret analysis is provided.

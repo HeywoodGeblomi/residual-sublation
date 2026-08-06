@@ -1,47 +1,90 @@
-# Residual Sublation Layer (RSL)
+# Dynamic Commitment Layer (DCL)
 
-A small, general-purpose decision module for adaptive residual handling.
+**v0.2.0 — surgical rewrite**
 
-It treats residual disorder and the system’s own diagnostic competence as a dual signal, maintains a hidden polarity state, and elevates into a restricted disposition when both signals co-occur under correlation. The elevation is designed to be non-reducible to ordinary residual + confidence + hysteresis monitors.
+A minimal decision module that introduces an explicit **dynamic hidden variable** required for correct long-horizon residual-diagnostic behavior.
 
-## Status (v0.1.0)
+---
 
-- Formal non-reducibility argument (hidden parity)
-- Explicit senility hard-case separation
-- Sketch-level residual potential under elevation
-- Minimal C11/C++ header
-- Empirical harness showing dual-active window + lower cumulative residual error on a recoverable senility schedule
+### Core Claim
 
-This is a research-grade module, not a production drop-in replacement for existing residual logic.
+There exist residual-diagnostic processes whose correct long-horizon behavior is impossible without a dynamic hidden variable that simultaneously:
 
-## Files
+1. **stores memory** the visible system is structurally forbidden to retain,
+2. **collapses ambiguity** by selecting among multiple futures consistent with the observations, and
+3. **maintains an internal model** of the process.
 
-| File | Description |
-|------|-------------|
-| `residual_sublation.h` | Standalone header (init / step / rewrite) |
-| `rsl_senility_harness.py` | Self-contained empirical stress test |
-| `RSL_DESIGN_NOTE.md` | Design rationale, non-reducibility argument, lineage |
+Once this variable is admitted, the joint process becomes well-posed.  
+Any monitor limited to the visible residual and competence signals is information-theoretically incomplete.
 
-## Quick use
+The Dynamic Commitment Layer supplies that variable explicitly.
+
+---
+
+### The Hidden Variable χ
+
+| Role                    | Function                                                                 |
+|-------------------------|--------------------------------------------------------------------------|
+| **B – Forbidden Memory**    | χ retains information that the visible pair (d, c) cannot carry forward |
+| **C – Future Selection**    | When multiple futures remain consistent with observations, χ selects one |
+| **D – Internal Model**      | χ acts as a minimal internal predictor / state estimate                 |
+
+These three roles are performed by the *same* bit.  
+No function of finite windows of the visible signals can satisfy all three simultaneously.
+
+---
+
+### State
 
 ```c
-#include "residual_sublation.h"
+typedef struct {
+    double d;       /* visible residual disorder           [0,1] */
+    double c;       /* visible diagnostic competence       [0,1] */
+    double lambda;  /* commitment tension                  [0,1] */
+    int    chi;     /* dynamic commitment variable χ       0/1  */
+} dcl_state_t;
+```
 
-rsl_state_t st;
-rsl_init(&st);
+* `d, c` — the only observables available to any external monitor
+* `lambda` — commitment tension
+* `chi` — the hidden commitment variable
 
-rsl_step(&st, &RSL_DEFAULTS, r_fresh, k_fresh, r_corr);
-if (rsl_rewrite(&st, &RSL_DEFAULTS, r_corr)) {
-    /* restricted policy π_λ */
+### Non-Reducibility
+
+Any residual + confidence + hysteresis construction maintains state that is a pure function of a finite history of (d, c).
+
+The value of χ controls both polarity and timing of subsequent commitment acts. After an odd number of transitions of χ, the future trajectory of the joint process diverges from every trajectory generable by a monitor that only sees the visible signals.
+
+The information gap is permanent.
+
+### Usage
+
+```c
+#include "dynamic_commitment.h"
+
+dcl_state_t s;
+dcl_init(&s);
+
+dcl_step(&s, &DCL_DEFAULTS, r_fresh, k_fresh, r_corr);
+
+if (dcl_commit(&s, &DCL_DEFAULTS, r_corr)) {
+    /* adopt committed (restricted) disposition */
 } else {
-    /* ordinary residual menu */
+    /* ordinary residual handling */
 }
 ```
 
-## Credit
+### Files
 
-Inspired by and builds upon residual and adaptive-sorting infrastructure developed by Heywood Geblomi (Photonic residual menu, residual_automaton / CycleGuard patterns, and the framing of residual instability under diagnostic degradation). The dual-signal elevation construction and hidden-parity non-reducibility argument are original to this module.
+| File | Description |
+|------|-------------|
+| `dynamic_commitment.h` | Header-only implementation |
+| `DCL_DESIGN_NOTE.md` | Full design rationale and non-reducibility argument |
+| `dcl_harness.py` | Empirical stress test |
 
-## License
+### Historical Note
 
-MIT
+This module was previously released as the Residual Sublation Layer (v0.1.0).  
+The surgical rewrite retains the repository and the hidden-variable DNA while discarding the elevation/sublation framing in favour of explicit dynamic commitment.
+
+License: MIT
